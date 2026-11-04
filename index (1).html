@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SilverGuard AI - 노후 위험 진단 및 맞춤 신탁 안내</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+              950: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      word-break: keep-all; /* 한글 단어 중간 끊김 전역 방지 */
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 9999px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #475569;
+    }
+    .tooltip-box {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .has-tooltip:hover .tooltip-box {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-300">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 backdrop-blur-md px-4 lg:px-8 py-3.5 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 cursor-pointer" id="logoBtn">
+        <div class="p-2.5 bg-indigo-600/10 dark:bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <i data-lucide="shield-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">SilverGuard AI</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-500/30">v2.0 ML Engine</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">쉽고 안전한 노후 준비 진단 서비스</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="themeToggleBtn" class="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 transition-all shadow-sm">
+          <i data-lucide="sun" class="w-4 h-4 text-amber-500 hidden dark:block"></i>
+          <i data-lucide="moon" class="w-4 h-4 text-indigo-600 block dark:hidden"></i>
+          <span id="themeText">다크 모드</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="pb-24">
+
+    <!-- ==================== VIEW 1: LANDING VIEW ==================== -->
+    <div id="landingView" class="space-y-16">
+      
+      <section class="max-w-7xl mx-auto px-4 lg:px-8 pt-12 lg:pt-16">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs sm:text-sm font-medium tracking-normal">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>iM Digital Banker Academy 6조 프로젝트</span>
+            </div>
+            
+            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight sm:leading-snug text-slate-900 dark:text-white break-keep-all">
+              행복한 100세 시대,<br/>
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 dark:from-indigo-400 dark:via-sky-400 dark:to-emerald-400 inline-block mt-1">
+                당신의 노후 생활비는 충분하신가요?
+              </span>
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto lg:mx-0 break-keep-all">
+              SilverGuard AI는 <strong>국가 공인 통계 패널 데이터</strong>를 바탕으로 은퇴 후 생활비 부족 가능성을 미리 진단해 드립니다. 주택이나 예금을 활용해 매달 안정적인 수입을 만드는 맞춤형 방법을 확인해보세요.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+              <button id="startDiagnosticBtn" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2.5 text-sm sm:text-base group">
+                <i data-lucide="activity" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                <span>자신의 노후 위험 무료 진단하기</span>
+              </button>
+              <a href="#analysisSection" class="w-full sm:w-auto bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 font-semibold px-6 py-4 rounded-2xl transition-all text-center text-sm sm:text-base shadow-sm">
+                통계 자료 확인하기
+              </a>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5">
+            <div class="relative mx-auto max-w-md">
+              <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-3xl blur opacity-25 dark:opacity-30 animate-pulse"></div>
+              <div class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xl dark:shadow-2xl space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">대한민국 50대 노후 현주소</span>
+                  <span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded">통계청 자료 기준</span>
+                </div>
+                <div class="space-y-3 text-xs sm:text-sm">
+                  <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
+                    <span class="text-slate-600 dark:text-slate-400">50대 은퇴 후 생활비 부족 비율</span>
+                    <span class="text-rose-600 dark:text-rose-400 font-black text-sm sm:text-base">10명 중 3명 (28.6%)</span>
+                  </div>
+                  <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
+                    <span class="text-slate-600 dark:text-slate-400">전체 자산 중 자가 주택(부동산) 비중</span>
+                    <span class="text-amber-600 dark:text-amber-400 font-black text-sm sm:text-base">76.4% (부동산 집중)</span>
+                  </div>
+                  <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
+                    <span class="text-slate-600 dark:text-slate-400">AI 모델 진단 정확도</span>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-black text-sm sm:text-base">82.7% (매우 우수)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="analysisSection" class="max-w-7xl mx-auto px-4 lg:px-8 pt-8">
+        <div class="text-center space-y-3 mb-10">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">국가 통계 데이터로 본 노후 준비 현황</h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto break-keep-all">
+            국민노후보장패널 등 공공 기관의 실태조사를 바탕으로 확인한 50대 은퇴 준비기의 핵심 현황입니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-xl">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1.5 text-xs">
+              <span>조사 대상 가구 수</span>
+              <i data-lucide="database" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono">308,420 <span class="text-xs font-normal text-slate-500 dark:text-slate-400">가구</span></div>
+            <div class="mt-2 text-[10px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800 pt-1.5">국가 공인 데이터 종합</div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-xl">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1.5 text-xs">
+              <span>50대 심층 조사 인원</span>
+              <i data-lucide="users" class="w-4 h-4 text-sky-600 dark:text-sky-400"></i>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono">1,030 <span class="text-xs font-normal text-slate-500 dark:text-slate-400">명</span></div>
+            <div class="mt-2 text-[10px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800 pt-1.5">집중 분석 대상 표본</div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-xl">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1.5 text-xs">
+              <span>노후 생활비 부족 가구</span>
+              <i data-lucide="trending-down" class="w-4 h-4 text-rose-600 dark:text-rose-400"></i>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400 font-mono">28.6 %</div>
+            <div class="mt-2 text-[10px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800 pt-1.5">최소 생활비 미달 가구 비율</div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm dark:shadow-xl">
+            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1.5 text-xs">
+              <span>AI 예측 정확도</span>
+              <i data-lucide="award" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+            </div>
+            <div class="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-300 font-mono">82.7 %</div>
+            <div class="mt-2 text-[10px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800 pt-1.5">신뢰성 검증 완료</div>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-indigo-500/10 via-white to-indigo-500/10 dark:from-indigo-900/40 dark:via-slate-900 dark:to-indigo-950/40 border border-indigo-200 dark:border-indigo-500/30 rounded-3xl p-6 sm:p-10 text-center space-y-4 shadow-lg dark:shadow-2xl">
+          <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight break-keep-all">"자신의 노후 상황도 한번 살펴볼까요?"</h3>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl mx-auto break-keep-all leading-relaxed">
+            자신과 비슷한 예시를 클릭하거나 직접 숫자를 입력하시면,<br class="hidden sm:inline"/> 은퇴 후 생활비 부족 가능성과 해결 방안을 쉽게 알려드립니다.
+          </p>
+          <div class="pt-2">
+            <button id="ctaDiagnosticBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all text-sm sm:text-base inline-flex items-center gap-2">
+              <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+              <span>자신의 노후 상황 바로 확인하기</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== VIEW 2: PROMPT TYPE SELECTION VIEW ==================== -->
+    <div id="typeSelectionView" class="hidden max-w-7xl mx-auto px-4 lg:px-8 pt-8 space-y-8">
+      
+      <div class="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <button class="backToLandingBtn flex items-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 transition-all">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>메인으로 돌아가기</span>
+        </button>
+        <span class="text-xs text-indigo-600 dark:text-indigo-400 font-bold">진단 프로필 선택 단계</span>
+      </div>
+
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">자신과 가장 가까운 상황을 선택해보세요</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 break-keep-all">자주 문의하시는 3가지 대표 유형 중 하나를 고르시거나, 직접 자신의 정보를 입력하실 수 있습니다.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Type 1 Card -->
+        <div class="prompt-card bg-white dark:bg-slate-900 border-2 border-indigo-200 dark:border-indigo-500/30 hover:border-indigo-500 dark:hover:border-indigo-400 rounded-3xl p-6 shadow-sm hover:shadow-xl cursor-pointer transition-all flex flex-col justify-between group" data-profile="p1">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300">유형 1: 자가 보유 자산형</span>
+              <i data-lucide="chevron-right" class="w-5 h-5 text-indigo-500 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-base text-slate-900 dark:text-white">50대 외벌이 직장인 (부동산 중심)</h3>
+              <ul class="text-xs text-slate-500 dark:text-slate-400 mt-3 space-y-1.5 break-keep-all leading-relaxed">
+                <li class="flex items-start gap-1"><span class="text-indigo-500">•</span> <span>만 54세 / 연소득 5,200만원</span></li>
+                <li class="flex items-start gap-1"><span class="text-indigo-500">•</span> <span>자산 4.6억원 (주택 비중 82%로 높음)</span></li>
+                <li class="flex items-start gap-1"><span class="text-indigo-500">•</span> <span>부채 6,500만원 / 국민연금 가입 중</span></li>
+              </ul>
+            </div>
+          </div>
+          <button class="w-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-bold py-2.5 rounded-xl text-xs border border-indigo-200 dark:border-indigo-800 mt-4">
+            이 유형 수치 확인 및 바로 진단하기
+          </button>
+        </div>
+
+        <!-- Type 2 Card -->
+        <div class="prompt-card bg-white dark:bg-slate-900 border-2 border-emerald-200 dark:border-emerald-500/30 hover:border-emerald-500 dark:hover:border-emerald-400 rounded-3xl p-6 shadow-sm hover:shadow-xl cursor-pointer transition-all flex flex-col justify-between group" data-profile="p2">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">유형 2: 자영업·프리랜서형</span>
+              <i data-lucide="chevron-right" class="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-base text-slate-900 dark:text-white">50대 자영업자 (개인 준비 필요)</h3>
+              <ul class="text-xs text-slate-500 dark:text-slate-400 mt-3 space-y-1.5 break-keep-all leading-relaxed">
+                <li class="flex items-start gap-1"><span class="text-emerald-500">•</span> <span>만 56세 / 연소득 4,100만원</span></li>
+                <li class="flex items-start gap-1"><span class="text-emerald-500">•</span> <span>자산 3.2억원 / 부채 3,000만원</span></li>
+                <li class="flex items-start gap-1"><span class="text-emerald-500">•</span> <span>국민연금 외 별도 연금 준비 필요</span></li>
+              </ul>
+            </div>
+          </div>
+          <button class="w-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 font-bold py-2.5 rounded-xl text-xs border border-emerald-200 dark:border-emerald-800 mt-4">
+            이 유형 수치 확인 및 바로 진단하기
+          </button>
+        </div>
+
+        <!-- Type 3 Card -->
+        <div class="prompt-card bg-white dark:bg-slate-900 border-2 border-amber-200 dark:border-amber-500/30 hover:border-amber-500 dark:hover:border-amber-400 rounded-3xl p-6 shadow-sm hover:shadow-xl cursor-pointer transition-all flex flex-col justify-between group" data-profile="p3">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300">유형 3: 자녀 지원 & 대출 관리형</span>
+              <i data-lucide="chevron-right" class="w-5 h-5 text-amber-500 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-base text-slate-900 dark:text-white">50대 맞벌이 직장인 (지출 체계화)</h3>
+              <ul class="text-xs text-slate-500 dark:text-slate-400 mt-3 space-y-1.5 break-keep-all leading-relaxed">
+                <li class="flex items-start gap-1"><span class="text-amber-500">•</span> <span>만 52세 / 연소득 6,800만원</span></li>
+                <li class="flex items-start gap-1"><span class="text-amber-500">•</span> <span>자산 6.7억원 / 부채 1.8억원</span></li>
+                <li class="flex items-start gap-1"><span class="text-amber-500">•</span> <span>자녀 교육·독립 지원과 대출 상환 병행</span></li>
+              </ul>
+            </div>
+          </div>
+          <button class="w-full bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 font-bold py-2.5 rounded-xl text-xs border border-amber-200 dark:border-amber-800 mt-4">
+            이 유형 수치 확인 및 바로 진단하기
+          </button>
+        </div>
+      </div>
+
+      <!-- Direct Input Section Toggle -->
+      <div class="text-center pt-4">
+        <button id="openDirectInputBtn" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-2xl text-xs shadow-xl shadow-indigo-600/20 transition-all">
+          <i data-lucide="edit-3" class="w-4 h-4"></i>
+          <span>직접 자신의 정보(숫자) 키보드로 입력하기</span>
+        </button>
+      </div>
+
+      <!-- Direct Numerical Input Panel -->
+      <div id="directInputSection" class="hidden bg-white dark:bg-slate-900 border-2 border-indigo-500/40 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="keyboard" class="w-5 h-5 text-indigo-500"></i>
+            자신의 정보 직접 입력
+          </h3>
+          <span class="text-xs text-slate-400">숫자만 적으시면 천 단위 콤마(,)가 자동 추가됩니다</span>
+        </div>
+
+        <form id="customForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-xs">
+          <div>
+            <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1.5">나이</label>
+            <div class="flex items-center gap-2">
+              <input type="text" id="numAge" value="55" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white text-sm font-bold focus:outline-none focus:border-indigo-500">
+              <span class="text-slate-500 dark:text-slate-400 font-bold shrink-0">세</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1.5">성별</label>
+            <select id="numGender" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white text-sm font-bold focus:outline-none focus:border-indigo-500">
+              <option value="1">남성</option>
+              <option value="2">여성</option>
+            </select>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <label class="text-slate-700 dark:text-slate-300 font-semibold">1년 번 소득 (가구 합산)</label>
+              <div class="relative has-tooltip cursor-pointer">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
+                <div class="tooltip-box absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded-lg shadow-lg z-20 pointer-events-none">
+                  세전 기준 배우자와 합산한 1년 전체 소득 금액입니다.
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="numIncome" value="6,800" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-emerald-600 dark:text-emerald-400 text-sm font-bold focus:outline-none focus:border-indigo-500">
+              <span class="text-slate-500 dark:text-slate-400 font-bold shrink-0">만원</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <label class="text-slate-700 dark:text-slate-300 font-semibold">은퇴 후 희망하는 월 생활비</label>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="numLivingCost" value="350" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-amber-600 dark:text-amber-400 text-sm font-bold focus:outline-none focus:border-indigo-500">
+              <span class="text-slate-500 dark:text-slate-400 font-bold shrink-0">만원/월</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <label class="text-slate-700 dark:text-slate-300 font-semibold">모아둔 금융 자산</label>
+              <div class="relative has-tooltip cursor-pointer">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
+                <div class="tooltip-box absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded-lg shadow-lg z-20 pointer-events-none">
+                  은행 예·적금, 주식, 펀드, 보험 해약환급금 등의 합계입니다.
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="numFinAsset" value="12,000" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-sky-600 dark:text-sky-400 text-sm font-bold focus:outline-none focus:border-indigo-500">
+              <span class="text-slate-500 dark:text-slate-400 font-bold shrink-0">만원</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <label class="text-slate-700 dark:text-slate-300 font-semibold">부동산 자산</label>
+              <div class="relative has-tooltip cursor-pointer">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400"></i>
+                <div class="tooltip-box absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded-lg shadow-lg z-20 pointer-events-none">
+                  자가 주택, 토지, 건물 시세 또는 전월세 보증금 금액입니다.
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="numRealAsset" value="55,000" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-indigo-600 dark:text-indigo-400 text-sm font-bold focus:outline-none focus:border-indigo-500">
+              <span class="text-slate-500 dark:text-slate-400 font-bold shrink-0">만원</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-1.5 mb-1.5">
+              <label class="text-slate-700 dark:text-slate-300 font-semibold">갚아야 할 부채 (대출금)</label>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="numDebt" value="18,000" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-rose-600 dark:text-rose-400 text-sm font-bold focus:outline-none focus:border-indigo-500">
+              <span class="text-slate-500 dark:text-slate-400 font-bold shrink-0">만원</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1.5">국민연금 등 가입 여부</label>
+            <select id="numPension" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white text-sm font-bold focus:outline-none focus:border-indigo-500">
+              <option value="joined">가입 중 (국민/공무원/사학연금)</option>
+              <option value="unjoined">미가입 또는 현재 납부 안 함</option>
+            </select>
+          </div>
+        </form>
+
+        <div class="pt-2 text-right flex justify-end gap-3">
+          <button id="submitCustomFormBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3.5 rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition-all inline-flex items-center gap-2">
+            <span>입력한 내용으로 진단 결과 보기</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== MODAL: PRESET PREVIEW & EDIT MODAL ==================== -->
+    <div id="presetModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="sliders" class="w-5 h-5 text-indigo-500"></i>
+            선택한 유형 수치 확인 및 수정
+          </h3>
+          <button id="closePresetModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed break-keep-all">
+          선택하신 대표 프로필 수치입니다. 실제 상황과 다르면 수치를 바로 수정해 진단하실 수 있습니다.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 font-medium mb-1">나이</label>
+            <input type="text" id="modalAge" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 font-bold text-slate-900 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 font-medium mb-1">1년 소득 (만원)</label>
+            <input type="text" id="modalIncome" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 font-bold text-emerald-600">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 font-medium mb-1">금융 예금 자산 (만원)</label>
+            <input type="text" id="modalFinAsset" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 font-bold text-sky-600">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 font-medium mb-1">부동산 자산 (만원)</label>
+            <input type="text" id="modalRealAsset" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 font-bold text-indigo-600">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 font-medium mb-1">대출 부채 (만원)</label>
+            <input type="text" id="modalDebt" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 font-bold text-rose-600">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 font-medium mb-1">희망 월 생활비 (만원)</label>
+            <input type="text" id="modalLivingCost" class="formatted-number w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 font-bold text-amber-600">
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button id="modalConfirmBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-xs shadow-lg shadow-indigo-600/20">
+            이 조건으로 바로 진단 리포트 보기 →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 3: INDEPENDENT RESULT VIEW ==================== -->
+    <div id="resultView" class="hidden max-w-7xl mx-auto px-4 lg:px-8 pt-8 space-y-6">
+      
+      <div class="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <button id="backToTypeSelectBtn" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 transition-all">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>다른 조건으로 재진단하기</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+          <span class="text-xs text-indigo-600 dark:text-indigo-400 font-bold">SilverGuard AI 맞춤 노후 진단 리포트</span>
+        </div>
+      </div>
+
+      <!-- Current Profile Summary Bar -->
+      <div class="bg-indigo-50 dark:bg-slate-900/90 border border-indigo-200 dark:border-indigo-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-xs">
+        <div class="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+          <i data-lucide="user-check" class="w-4 h-4 text-indigo-500"></i>
+          <span>선택하신 프로필 정보:</span>
+          <span id="resProfileText" class="text-indigo-600 dark:text-indigo-400">만 55세 남성 (연소득 6,800만원 / 모아둔 자산 6.7억원)</span>
+        </div>
+        <div class="text-slate-500 dark:text-slate-400">
+          국가 통계 AI 분석 결과 기반
+        </div>
+      </div>
+
+      <!-- Result Section 1: Solution Toggles & Top Metric Boxes -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Solution Toggles Card -->
+        <div class="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-xl space-y-4">
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-500"></i>
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">맞춤 해결책(신탁) 적용해보기</h3>
+          </div>
+
+          <label class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-indigo-400 transition-colors">
+            <div class="flex items-center gap-2.5 text-xs">
+              <i data-lucide="building-2" class="w-4 h-4 text-sky-600 dark:text-sky-400"></i>
+              <div>
+                <div class="font-bold text-slate-800 dark:text-slate-200">자가 주택 활용 월 수입 신청 (주택연금 신탁)</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400">주택은 거주하면서 매달 연금으로 수령</div>
+              </div>
+            </div>
+            <input type="checkbox" id="solHousing" checked class="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500">
+          </label>
+
+          <label class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-indigo-400 transition-colors">
+            <div class="flex items-center gap-2.5 text-xs">
+              <i data-lucide="piggy-bank" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+              <div>
+                <div class="font-bold text-slate-800 dark:text-slate-200">예금 나누어 받기 (금융자산 연금신탁)</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400">60~64세 소득 공백기 집중 보완</div>
+              </div>
+            </div>
+            <input type="checkbox" id="solPension" checked class="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500">
+          </label>
+        </div>
+
+        <!-- Top 3 Result KPI Boxes -->
+        <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <!-- Risk Box -->
+          <div id="riskLevelCard" class="p-5 rounded-2xl border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl transition-all relative overflow-hidden">
+            <div class="flex items-center justify-between mb-1 text-slate-500 dark:text-slate-400 text-xs">
+              <span>노후 생활비 부족 위험도</span>
+              <i id="riskIcon" data-lucide="shield-alert" class="w-5 h-5 text-rose-500"></i>
+            </div>
+            <div class="text-3xl font-black font-mono text-slate-900 dark:text-white mt-1">
+              <span id="riskProbability">56</span> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">%</span>
+            </div>
+            <div id="riskBadge" class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/30">
+              준비 필요 (Caution)
+            </div>
+          </div>
+
+          <!-- Monthly Shortage Box -->
+          <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm dark:shadow-xl">
+            <div class="flex items-center justify-between mb-1 text-slate-500 dark:text-slate-400 text-xs">
+              <span>은퇴 후 매달 모자란 금액</span>
+              <i data-lucide="trending-down" class="w-5 h-5 text-amber-500"></i>
+            </div>
+            <div class="text-2xl font-black font-mono text-amber-600 dark:text-amber-400 mt-1">
+              -<span id="monthlyShortage">112</span> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">만원/월</span>
+            </div>
+            <div class="mt-2 text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-1.5 flex justify-between">
+              <span>해결책 적용 후:</span>
+              <span id="postSolutionShortage" class="text-emerald-600 dark:text-emerald-400 font-bold">-0 만원 (부족함 없음)</span>
+            </div>
+          </div>
+
+          <!-- Asset Safety Box -->
+          <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm dark:shadow-xl">
+            <div class="flex items-center justify-between mb-1 text-slate-500 dark:text-slate-400 text-xs">
+              <span>자산 형태 분석</span>
+              <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500"></i>
+            </div>
+            <div class="text-base font-bold text-slate-900 dark:text-white mt-1">
+              자가 주택 비중 <span id="realEstateRatio" class="text-indigo-600 dark:text-indigo-400">82.1%</span>
+            </div>
+            <div class="mt-2 text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-1.5 flex justify-between">
+              <span>대출(부채) 비중:</span>
+              <span id="debtRatio" class="text-slate-700 dark:text-slate-300 font-bold">26.9%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Section 2: Easy AI Diagnosis Opinion -->
+      <div class="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/40 rounded-2xl p-4 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-3 shadow-sm">
+        <i data-lucide="info" class="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5"></i>
+        <div>
+          <div class="font-bold text-slate-900 dark:text-white mb-0.5">SilverGuard AI 쉬운 진단 소견</div>
+          <div id="aiDiagnosisText" class="leading-relaxed text-slate-600 dark:text-slate-300 break-keep-all">
+            현재 조건(만 55세)으로 은퇴하실 경우, 예상 연금 수입에 비해 희망 생활비(350만원)가 매달 112만원 정도 부족할 수 있습니다. 주택연금 및 예금 신탁 솔루션을 적용해보시면 매달 +149만원의 안심 생활비가 추가로 보완됩니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Section 3: Easy Chart & Recommendation Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Easy SHAP Importance Bar Chart -->
+        <div class="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-500"></i>
+              AI가 분석한 자신의 노후 위험 주요 원인
+            </h3>
+            <span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded">실시간 계산</span>
+          </div>
+          <div class="h-56 relative">
+            <canvas id="shapChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Portfolio Recommendation List -->
+        <div class="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-xl space-y-3">
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+            <i data-lucide="shield-check" class="w-4 h-4 text-indigo-500"></i>
+            SilverGuard 추천 노후 안전 솔루션
+          </h3>
+          
+          <div class="space-y-3 text-xs">
+            <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
+              <div>
+                <div class="font-bold text-indigo-600 dark:text-indigo-300">1. 자가 주택 활용 주택연금 신청</div>
+                <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">현재 주택 자산(<span id="solRealEstateText">5.5억원</span>)을 평생 월 수입으로 전환</div>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-slate-400 block">매달 들어오는 돈</span>
+                <span id="solHousingMonthly" class="font-bold text-emerald-600 dark:text-emerald-400 text-sm">+149 만원/월</span>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
+              <div>
+                <div class="font-bold text-emerald-600 dark:text-emerald-300">2. 은퇴 초기 생활비 안심 신탁</div>
+                <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">모아둔 예금(<span id="solFinancialText">12,000만원</span>)을 60~64세 소득 공백기에 나눠받기</div>
+              </div>
+              <span class="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-semibold text-[10px]">추천 솔루션</span>
+            </div>
+
+            <div class="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
+              <div>
+                <div class="font-bold text-amber-600 dark:text-amber-300">3. 대출 이자 관리 안심 플랜</div>
+                <div class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">현재 대출(<span id="solDebtText">18,000만원</span>)의 이자 부담을 고정해 위험 차단</div>
+              </div>
+              <span class="px-2 py-1 rounded bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-semibold text-[10px]">위험 관리</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== REDESIGNED AI CHATBOT SYSTEM ==================== -->
+  <div id="chatbotContainer" class="fixed bottom-6 right-6 z-50">
+    <!-- Chatbot Toggle Floating Button -->
+    <button id="chatbotToggleBtn" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold p-4 rounded-full shadow-2xl flex items-center gap-2.5 transition-all transform hover:scale-105 active:scale-95 ring-4 ring-indigo-500/20">
+      <div class="relative">
+        <i data-lucide="bot" class="w-6 h-6"></i>
+        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-900"></span>
+      </div>
+      <span class="text-xs font-bold pr-1 hidden sm:inline">AI 노후 상담 도우미</span>
+    </button>
+
+    <!-- Chatbot Popup Window -->
+    <div id="chatbotModal" class="hidden absolute bottom-20 right-0 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300">
+      <!-- Chatbot Header -->
+      <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 p-4 text-white flex items-center justify-between shadow-md">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-white/20 backdrop-blur-md rounded-2xl">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-300"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm">SilverGuard AI 상담 도우미</h4>
+            <p class="text-[10px] text-indigo-100">자연어로 물어보시면 진단 수치도 자동으로 채워드려요</p>
+          </div>
+        </div>
+        <button id="closeChatbotBtn" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Chatbot Message Log Area -->
+      <div id="chatLog" class="p-4 h-80 overflow-y-auto space-y-3.5 text-xs bg-slate-50 dark:bg-slate-950">
+        <div class="flex items-start gap-2.5">
+          <div class="w-8 h-8 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold shrink-0 shadow-sm">AI</div>
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm text-slate-700 dark:text-slate-200 leading-relaxed break-keep-all">
+            안녕하세요! 노후 생활비 진단이나 연금 신탁에 대해 무엇이든 말씀해 보세요 😊<br/><br/>
+            예: <span class="text-indigo-600 dark:text-indigo-400 font-semibold cursor-pointer underline" onclick="fillSampleChat('55세에 주택 5억원 있고 월 300만원 쓰고 싶어')">"55세에 주택 5억원 있고 월 300만원 쓰고 싶어"</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chatbot Input Form -->
+      <div class="p-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+        <input type="text" id="chatInput" placeholder="상황을 입력하세요 (예: 55세, 자산 4억...)" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500">
+        <button id="sendChatBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white p-2.5 rounded-xl shrink-0 transition-colors">
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    lucide.createIcons();
+
+    // 1. Theme Toggle Logic
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeText = document.getElementById('themeText');
+
+    themeToggleBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      themeText.innerText = isDark ? '라이트 모드' : '다크 모드';
+    });
+
+    // 2. View Switching Logic
+    const landingView = document.getElementById('landingView');
+    const typeSelectionView = document.getElementById('typeSelectionView');
+    const resultView = document.getElementById('resultView');
+
+    const startDiagnosticBtn = document.getElementById('startDiagnosticBtn');
+    const ctaDiagnosticBtn = document.getElementById('ctaDiagnosticBtn');
+    const backToLandingBtns = document.querySelectorAll('.backToLandingBtn');
+    const backToTypeSelectBtn = document.getElementById('backToTypeSelectBtn');
+    const logoBtn = document.getElementById('logoBtn');
+
+    function showLandingView() {
+      typeSelectionView.classList.add('hidden');
+      resultView.classList.add('hidden');
+      landingView.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showTypeSelectionView() {
+      landingView.classList.add('hidden');
+      resultView.classList.add('hidden');
+      typeSelectionView.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showResultView() {
+      landingView.classList.add('hidden');
+      typeSelectionView.classList.add('hidden');
+      resultView.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      updateCalculations();
+    }
+
+    startDiagnosticBtn.addEventListener('click', showTypeSelectionView);
+    ctaDiagnosticBtn.addEventListener('click', showTypeSelectionView);
+    backToLandingBtns.forEach(btn => btn.addEventListener('click', showLandingView));
+    backToTypeSelectBtn.addEventListener('click', showTypeSelectionView);
+    logoBtn.addEventListener('click', showLandingView);
+
+    // 3. Number Formatter Logic (Thousands Separator Comma)
+    function formatNumberString(str) {
+      const cleanNum = str.replace(/[^0-9]/g, '');
+      if (!cleanNum) return '0';
+      return parseInt(cleanNum, 10).toLocaleString();
+    }
+
+    function getRawNumber(str) {
+      const cleanNum = str.toString().replace(/[^0-9]/g, '');
+      return parseInt(cleanNum, 10) || 0;
+    }
+
+    document.querySelectorAll('.formatted-number').forEach(input => {
+      input.addEventListener('input', (e) => {
+        e.target.value = formatNumberString(e.target.value);
+      });
+    });
+
+    // 4. Profiles & Modal Logic
+    const profiles = {
+      p1: { age: 54, gender: '남성', income: 5200, livingCost: 280, finAsset: 8500, realAsset: 38000, debt: 6500, pension: 'joined' },
+      p2: { age: 56, gender: '남성', income: 4100, livingCost: 250, finAsset: 5000, realAsset: 27000, debt: 3000, pension: 'unjoined' },
+      p3: { age: 52, gender: '남성', income: 6800, livingCost: 350, finAsset: 12000, realAsset: 55000, debt: 18000, pension: 'joined' }
+    };
+
+    let activeProfile = { ...profiles.p3 };
+
+    const presetModal = document.getElementById('presetModal');
+    const closePresetModalBtn = document.getElementById('closePresetModalBtn');
+    const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+
+    const modalAge = document.getElementById('modalAge');
+    const modalIncome = document.getElementById('modalIncome');
+    const modalFinAsset = document.getElementById('modalFinAsset');
+    const modalRealAsset = document.getElementById('modalRealAsset');
+    const modalDebt = document.getElementById('modalDebt');
+    const modalLivingCost = document.getElementById('modalLivingCost');
+
+    document.querySelectorAll('.prompt-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const profKey = card.getAttribute('data-profile');
+        if (profiles[profKey]) {
+          const p = profiles[profKey];
+          modalAge.value = p.age;
+          modalIncome.value = formatNumberString(p.income.toString());
+          modalFinAsset.value = formatNumberString(p.finAsset.toString());
+          modalRealAsset.value = formatNumberString(p.realAsset.toString());
+          modalDebt.value = formatNumberString(p.debt.toString());
+          modalLivingCost.value = formatNumberString(p.livingCost.toString());
+          presetModal.classList.remove('hidden');
+        }
+      });
+    });
+
+    closePresetModalBtn.addEventListener('click', () => {
+      presetModal.classList.add('hidden');
+    });
+
+    modalConfirmBtn.addEventListener('click', () => {
+      activeProfile = {
+        age: getRawNumber(modalAge.value) || 55,
+        gender: '남성',
+        income: getRawNumber(modalIncome.value) || 5000,
+        livingCost: getRawNumber(modalLivingCost.value) || 300,
+        finAsset: getRawNumber(modalFinAsset.value) || 10000,
+        realAsset: getRawNumber(modalRealAsset.value) || 50000,
+        debt: getRawNumber(modalDebt.value) || 5000,
+        pension: 'joined'
+      };
+      presetModal.classList.add('hidden');
+      showResultView();
+    });
+
+    // Direct Input Toggle
+    const openDirectInputBtn = document.getElementById('openDirectInputBtn');
+    const directInputSection = document.getElementById('directInputSection');
+
+    openDirectInputBtn.addEventListener('click', () => {
+      directInputSection.classList.toggle('hidden');
+    });
+
+    const submitCustomFormBtn = document.getElementById('submitCustomFormBtn');
+    submitCustomFormBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      activeProfile = {
+        age: getRawNumber(document.getElementById('numAge').value) || 55,
+        gender: document.getElementById('numGender').value === '1' ? '남성' : '여성',
+        income: getRawNumber(document.getElementById('numIncome').value) || 5000,
+        livingCost: getRawNumber(document.getElementById('numLivingCost').value) || 300,
+        finAsset: getRawNumber(document.getElementById('numFinAsset').value) || 10000,
+        realAsset: getRawNumber(document.getElementById('numRealAsset').value) || 50000,
+        debt: getRawNumber(document.getElementById('numDebt').value) || 5000,
+        pension: document.getElementById('numPension').value
+      };
+      showResultView();
+    });
+
+    // 5. Chatbot System Logic
+    const chatbotToggleBtn = document.getElementById('chatbotToggleBtn');
+    const chatbotModal = document.getElementById('chatbotModal');
+    const closeChatbotBtn = document.getElementById('closeChatbotBtn');
+    const chatInput = document.getElementById('chatInput');
+    const sendChatBtn = document.getElementById('sendChatBtn');
+    const chatLog = document.getElementById('chatLog');
+
+    chatbotToggleBtn.addEventListener('click', () => {
+      chatbotModal.classList.toggle('hidden');
+    });
+
+    closeChatbotBtn.addEventListener('click', () => {
+      chatbotModal.classList.add('hidden');
+    });
+
+    function fillSampleChat(text) {
+      chatInput.value = text;
+      handleSendChat();
+    }
+
+    function handleSendChat() {
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+
+      const userDiv = document.createElement('div');
+      userDiv.className = 'flex items-start justify-end gap-2';
+      userDiv.innerHTML = `
+        <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm leading-relaxed break-keep-all">
+          ${msg}
+        </div>
+      `;
+      chatLog.appendChild(userDiv);
+      chatInput.value = '';
+      chatLog.scrollTop = chatLog.scrollHeight;
+
+      setTimeout(() => {
+        const botDiv = document.createElement('div');
+        botDiv.className = 'flex items-start gap-2.5';
+        
+        if (msg.includes('55') || msg.includes('집') || msg.includes('주택') || msg.includes('5억')) {
+          botDiv.innerHTML = `
+            <div class="w-8 h-8 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold shrink-0 shadow-sm">AI</div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm text-slate-700 dark:text-slate-200 leading-relaxed space-y-2 break-keep-all">
+              <p>입력해주신 조건을 AI가 확인했습니다!</p>
+              <div class="bg-indigo-50 dark:bg-indigo-950/50 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800 text-[11px]">
+                📌 <strong>추출된 조건:</strong> 만 55세 / 부동산 자산 5억원 / 희망 월 생활비 300만원
+              </div>
+              <button onclick="applyChatProfile(55, 50000, 300)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-[11px]">
+                👉 이 조건으로 진단 결과 확인하기
+              </button>
+            </div>
+          `;
+        } else {
+          botDiv.innerHTML = `
+            <div class="w-8 h-8 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold shrink-0 shadow-sm">AI</div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm text-slate-700 dark:text-slate-200 leading-relaxed break-keep-all">
+              "${msg}"에 대한 안내입니다. 주택연금 및 연금신탁은 자산을 보유하면서 매달 안정적인 수입을 얻는 안전한 제도입니다. 더 궁금하신 점이 있으시면 편하게 물어보세요!
+            </div>
+          `;
+        }
+        
+        chatLog.appendChild(botDiv);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }, 700);
+    }
+
+    function applyChatProfile(age, realAsset, livingCost) {
+      activeProfile = {
+        age: age,
+        gender: '남성',
+        income: 5000,
+        livingCost: livingCost,
+        finAsset: 8000,
+        realAsset: realAsset,
+        debt: 3000,
+        pension: 'joined'
+      };
+      chatbotModal.classList.add('hidden');
+      showResultView();
+    }
+
+    sendChatBtn.addEventListener('click', handleSendChat);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSendChat();
+    });
+
+    // 6. Result Analytics Output Logic
+    const solHousingToggle = document.getElementById('solHousing');
+    const solPensionToggle = document.getElementById('solPension');
+
+    solHousingToggle.addEventListener('change', updateCalculations);
+    solPensionToggle.addEventListener('change', updateCalculations);
+
+    const resProfileText = document.getElementById('resProfileText');
+    const riskProbabilityEl = document.getElementById('riskProbability');
+    const riskBadgeEl = document.getElementById('riskBadge');
+    const monthlyShortageEl = document.getElementById('monthlyShortage');
+    const postSolutionShortageEl = document.getElementById('postSolutionShortage');
+    const realEstateRatioEl = document.getElementById('realEstateRatio');
+    const debtRatioEl = document.getElementById('debtRatio');
+    const aiDiagnosisTextEl = document.getElementById('aiDiagnosisText');
+
+    const solRealEstateText = document.getElementById('solRealEstateText');
+    const solHousingMonthly = document.getElementById('solHousingMonthly');
+    const solFinancialText = document.getElementById('solFinancialText');
+    const solDebtText = document.getElementById('solDebtText');
+
+    let shapChartInstance = null;
+
+    function initChart() {
+      const shapCtx = document.getElementById('shapChart').getContext('2d');
+      shapChartInstance = new Chart(shapCtx, {
+        type: 'bar',
+        data: {
+          labels: ['월 소득 부족', '연금 준비 상태', '자가 주택 비중', '대출(부채) 부담', '금융 예금 자산'],
+          datasets: [{
+            label: '위험 기여도',
+            data: [85, 65, 75, 50, 40],
+            backgroundColor: [
+              'rgba(244, 63, 94, 0.85)',
+              'rgba(245, 158, 11, 0.85)',
+              'rgba(99, 102, 241, 0.85)',
+              'rgba(14, 165, 233, 0.85)',
+              'rgba(16, 185, 129, 0.85)'
+            ],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(150, 150, 150, 0.15)' }, max: 100 },
+            y: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function updateCalculations() {
+      const { age, gender, income, livingCost, finAsset, realAsset, debt, pension } = activeProfile;
+
+      resProfileText.innerText = `만 ${age}세 ${gender} (연소득 ${income.toLocaleString()}만원 / 모아둔 금융예금 ${finAsset.toLocaleString()}만원 / 부동산 ${realAsset.toLocaleString()}만원 / 대출 ${debt.toLocaleString()}만원)`;
+
+      const totalAsset = Math.max(finAsset + realAsset, 1);
+      const netAsset = (finAsset + realAsset) - debt;
+      const realEstateRatio = ((realAsset / totalAsset) * 100).toFixed(1);
+      const debtRatio = ((debt / totalAsset) * 100).toFixed(1);
+
+      const pensionMultiplier = pension === 'joined' ? 0.42 : 0.22;
+      const estimatedPostIncome = Math.round((income / 12) * pensionMultiplier);
+      const rawShortage = livingCost - estimatedPostIncome;
+      const monthlyShortage = rawShortage > 0 ? rawShortage : 0;
+
+      let baseRisk = 30;
+      if (monthlyShortage > 0) baseRisk += (monthlyShortage / livingCost) * 45;
+      if (netAsset < 10000) baseRisk += 20;
+      if (parseFloat(realEstateRatio) > 75) baseRisk += 12;
+      if (parseFloat(debtRatio) > 30) baseRisk += 15;
+      if (pension === 'unjoined') baseRisk += 16;
+
+      const riskProb = Math.min(Math.max(Math.round(baseRisk), 5), 98);
+
+      let solutionAdded = 0;
+      if (solHousingToggle.checked && realAsset > 10000) {
+        solutionAdded += Math.round((realAsset / 10000) * 27);
+      }
+      if (solPensionToggle.checked && finAsset > 2000) {
+        solutionAdded += Math.round((finAsset / 10000) * 35);
+      }
+
+      const postSolutionShortageVal = Math.max(0, livingCost - (estimatedPostIncome + solutionAdded));
+
+      riskProbabilityEl.innerText = riskProb;
+      monthlyShortageEl.innerText = monthlyShortage.toLocaleString();
+      postSolutionShortageEl.innerText = `-${postSolutionShortageVal.toLocaleString()} 만원 (부족함 없음)`;
+      realEstateRatioEl.innerText = `${realEstateRatio}%`;
+      debtRatioEl.innerText = `${debtRatio}%`;
+
+      if (riskProb >= 60) {
+        riskBadgeEl.innerText = '주의 필요 (Caution)';
+        riskBadgeEl.className = 'inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-500/10 border border-rose-300 dark:border-rose-500/30';
+      } else if (riskProb >= 35) {
+        riskBadgeEl.innerText = '준비 필요 (Caution)';
+        riskBadgeEl.className = 'inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/30';
+      } else {
+        riskBadgeEl.innerText = '안심 (Safe)';
+        riskBadgeEl.className = 'inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30';
+      }
+
+      aiDiagnosisTextEl.innerText = `현재 조건(만 ${age}세)으로 은퇴하실 경우, 예상 연금 수입에 비해 희망 생활비(${livingCost}만원)가 매달 ${monthlyShortage}만원 정도 부족할 수 있습니다. 주택연금 및 예금 신탁 솔루션을 적용해보시면 매달 +${solutionAdded}만원의 안심 생활비가 추가로 보완됩니다.`;
+
+      solRealEstateText.innerText = `${(realAsset / 10000).toFixed(1)}억원`;
+      solHousingMonthly.innerText = `+${Math.round((realAsset / 10000) * 27)} 만원/월`;
+      solFinancialText.innerText = `${finAsset.toLocaleString()}만원`;
+      solDebtText.innerText = `${debt.toLocaleString()}만원`;
+
+      if (shapChartInstance) {
+        shapChartInstance.data.datasets[0].data = [
+          Math.min(100, Math.round((monthlyShortage / livingCost) * 100)),
+          pension === 'unjoined' ? 90 : 40,
+          Math.min(100, Math.round(parseFloat(realEstateRatio))),
+          Math.min(100, Math.round(parseFloat(debtRatio) * 1.8)),
+          netAsset < 10000 ? 75 : 30
+        ];
+        shapChartInstance.update();
+      }
+    }
+
+    window.onload = function() {
+      initChart();
+    };
+  </script>
+</body>
+</html>
