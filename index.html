@@ -757,10 +757,12 @@ document.getElementById('askBtn').onclick = () => { const f = document.getElemen
   }
   function start(){
     open = true; box.hidden = false; document.body.classList.add('intro-on'); play.hidden = true;
-    v.muted = true; snd.textContent = '🔇 소리 켜기'; snd.setAttribute('aria-pressed', 'false');
+    v.muted = false; snd.textContent = '🔊 소리 끄기'; snd.setAttribute('aria-pressed', 'true');
     try { v.currentTime = 0; } catch (e) {}
-    const p = v.play();
-    if (p && p.catch) p.catch(() => { play.hidden = false; play.focus(); });   // 자동재생이 막히면 직접 누르게
+    v.play().catch(() => {   // 소리 있는 자동재생이 막히면 소리 없이 재생
+    v.muted = true; snd.textContent = '🔇 소리 켜기'; snd.setAttribute('aria-pressed', 'false');
+    v.play().catch(() => { play.hidden = false; play.focus(); });
+    });  // 자동재생이 막히면 직접 누르게
     guard = setTimeout(() => { if (open && v.readyState < 2) close(); }, 6000); // 6초 안에 못 불러오면 닫기
     skip.focus({ preventScroll: true });
   }
