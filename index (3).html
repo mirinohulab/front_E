@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미리노후 – 2년 먼저 보는 노후 소득 신호</title>
+<meta name="description" content="지금은 괜찮은 50~69세 중 2년 뒤 소득이 반복해서 빈곤선 아래로 떨어질 위험을, 6개 국가 패널로 학습한 머신러닝이 먼저 찾습니다. MVP 개발 중.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#f4f5f8; --card:#ffffff; --ink:#0f172a; --ink2:#475569; --ink3:#94a3b8; --line:#e2e8f0; --soft:#f8fafc;
+  --brand:#4f46e5; --brand2:#6366f1; --brand-bg:#eef2ff; --ok:#059669; --ok-bg:#ecfdf5; --warn:#d97706; --warn-bg:#fffbeb;
+  --bad:#e11d48; --bad-bg:#fff1f2; --shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1020; --card:#111827; --ink:#f1f5f9; --ink2:#cbd5e1; --ink3:#64748b; --line:#1f2937; --soft:#0f172a;
+  --brand:#818cf8; --brand2:#a5b4fc; --brand-bg:rgba(99,102,241,.14); --ok:#34d399; --ok-bg:rgba(16,185,129,.12);
+  --warn:#fbbf24; --warn-bg:rgba(245,158,11,.12); --bad:#fb7185; --bad-bg:rgba(244,63,94,.12); --shadow:0 8px 24px rgba(0,0,0,.35);}}
+:root[data-theme="dark"]{
+  --bg:#0b1020; --card:#111827; --ink:#f1f5f9; --ink2:#cbd5e1; --ink3:#64748b; --line:#1f2937; --soft:#0f172a;
+  --brand:#818cf8; --brand2:#a5b4fc; --brand-bg:rgba(99,102,241,.14); --ok:#34d399; --ok-bg:rgba(16,185,129,.12);
+  --warn:#fbbf24; --warn-bg:rgba(245,158,11,.12); --bad:#fb7185; --bad-bg:rgba(244,63,94,.12); --shadow:0 8px 24px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  word-break:keep-all;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--brand)}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hbar{display:flex;align-items:center;justify-content:space-between;gap:12px;height:62px}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:0;padding:0}
+.logo .mk{width:34px;height:34px;border-radius:10px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800}
+.logo b{font-size:18px;letter-spacing:-.02em}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--brand-bg);color:var(--brand)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;padding:14px 22px;font-weight:700;cursor:pointer;transition:transform .08s,filter .15s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--brand);color:#fff;box-shadow:0 8px 20px color-mix(in srgb,var(--brand) 30%,transparent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:var(--card);border:1px solid var(--line);color:var(--ink)}
+.btn.sm{padding:8px 14px;border-radius:10px;font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:22px}
+h1{font-size:clamp(28px,5vw,46px);line-height:1.25;letter-spacing:-.03em;margin:16px 0 14px}
+h2{font-size:clamp(22px,3.4vw,30px);letter-spacing:-.02em;margin:0 0 8px}
+h3{font-size:17px;margin:0 0 6px}
+.grad{background:linear-gradient(90deg,var(--brand),#0ea5e9 55%,#10b981);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--ink2);font-size:clamp(15px,2vw,17px);max-width:640px}
+.muted{color:var(--ink3);font-size:13px}
+.hero{display:grid;grid-template-columns:1.25fr 1fr;gap:32px;align-items:center;padding:48px 0 24px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat .v{font-size:clamp(22px,3vw,28px);font-weight:800;letter-spacing:-.02em;margin-top:4px}
+.stat .l{font-size:13px;color:var(--ink2)}
+.stat .s{font-size:11.5px;color:var(--ink3);margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+.list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.list li{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.list li b{white-space:nowrap}
+section{padding:36px 0}
+.sec-head{text-align:center;margin-bottom:22px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step .n{width:30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;margin-bottom:10px}
+.road{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.road .tag{font-size:12px;font-weight:700}
+.done{color:var(--ok)} .doing{color:var(--brand)} .next{color:var(--ink3)}
+.road ul{margin:8px 0 0;padding-left:18px;font-size:14px;color:var(--ink2)}
+footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--ink3);font-size:13px}
+.hidden{display:none!important}
+/* form */
+.who{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
+.seg{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer}
+.seg[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.preset{text-align:left;cursor:pointer;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:14px;transition:border-color .15s}
+.preset:hover{border-color:var(--brand)}
+.preset .t{font-size:12px;font-weight:700;color:var(--brand)}
+.preset ul{margin:6px 0 0;padding-left:16px;font-size:13px;color:var(--ink2)}
+.form{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 18px}
+.fld label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.fld .hint{font-size:12px;color:var(--ink3);margin-top:4px}
+.inp{display:flex;align-items:center;gap:8px}
+.inp input,.inp select,.quick input{width:100%;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-weight:700;font-size:15px;outline:none}
+.inp input:focus,.inp select:focus,.quick input:focus{border-color:var(--brand)}
+.inp span{font-size:13px;color:var(--ink2);white-space:nowrap}
+.yn{display:flex;gap:6px}
+.yn button{flex:1;border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:10px;font-weight:700;cursor:pointer}
+.yn button[aria-pressed="true"]{background:var(--brand-bg);border-color:var(--brand);color:var(--brand)}
+.group-t{grid-column:1/-1;font-size:12px;font-weight:800;color:var(--ink3);letter-spacing:.04em;border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:8px}
+.quick{display:flex;gap:8px}
+.note{font-size:13px;border-radius:14px;padding:12px 14px;background:var(--soft);border:1px solid var(--line);color:var(--ink2)}
+.note.warn{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+/* result */
+.rgrid{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;align-items:start}
+.badge{display:inline-block;font-size:13px;font-weight:800;padding:4px 12px;border-radius:999px}
+.b-high{background:var(--bad-bg);color:var(--bad)} .b-mid{background:var(--warn-bg);color:var(--warn)} .b-low{background:var(--ok-bg);color:var(--ok)} .b-na{background:var(--soft);color:var(--ink3)}
+.big{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.bars{display:grid;gap:10px;margin-top:6px}
+.bar .row{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:4px}
+.bar .track{height:10px;background:var(--soft);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.bar .fill{height:100%;border-radius:999px;background:var(--bad)}
+.bar .fill.down{background:var(--ok)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:14px}
+.kv .k{color:var(--ink2)} .kv .v{font-weight:800;text-align:right}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13.5px;cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--brand)}
+.prog{display:grid;gap:8px;margin:8px 0 0;padding:0;list-style:none}
+.prog li{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13.5px}
+.prog li b{display:block}
+.ratio-track{position:relative;height:14px;background:linear-gradient(90deg,var(--bad-bg),var(--warn-bg) 40%,var(--ok-bg));border-radius:999px;border:1px solid var(--line);margin:22px 0 6px}
+.ratio-mark{position:absolute;top:-22px;transform:translateX(-50%);font-size:12px;font-weight:800;white-space:nowrap}
+.ratio-mark::after{content:"";position:absolute;left:50%;top:18px;width:2px;height:18px;background:var(--ink);transform:translateX(-50%)}
+.ratio-line{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--bad)}
+@media (max-width:900px){
+  .hero,.rgrid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .steps,.road,.presets{grid-template-columns:1fr}
+  .form{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){ .form{grid-template-columns:1fr} .hide-sm{display:none} .card{padding:18px} }
+
+/* ===== 상담 챗봇 ===== */
+.cb-fab{position:fixed;right:20px;bottom:20px;z-index:40;display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:13px 18px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 10px 26px color-mix(in srgb,var(--brand) 35%,transparent)}
+.cb-fab:active{transform:scale(.97)}
+.cb-fab .dot{width:8px;height:8px;border-radius:50%;background:#34d399}
+.cb-panel{position:fixed;right:20px;bottom:84px;z-index:41;width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 120px));display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.cb-panel[hidden]{display:none}
+.cb-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.cb-head b{font-size:15px}
+.cb-head .muted{font-size:12px}
+.cb-x{border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:var(--ink3);padding:4px 8px;border-radius:8px}
+.cb-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--soft)}
+.cb-msg{max-width:86%;padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.cb-msg.bot{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-top-left-radius:4px}
+.cb-msg.me{align-self:flex-end;background:var(--brand);color:#fff;border-top-right-radius:4px}
+.cb-msg.sys{align-self:center;background:none;color:var(--ink3);font-size:12.5px;padding:2px 6px}
+.cb-sugg{display:flex;flex-wrap:wrap;gap:6px}
+.cb-sugg button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font-size:12.5px;cursor:pointer;color:var(--ink2)}
+.cb-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+.cb-form input{flex:1;min-width:0;border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:11px 12px;font-size:14px}
+.cb-form input:focus{outline:2px solid color-mix(in srgb,var(--brand) 40%,transparent);border-color:var(--brand)}
+.cb-form button{border:0;border-radius:12px;padding:0 16px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+.cb-form button:disabled,.cb-form input:disabled{opacity:.55;cursor:default}
+.cb-note{padding:0 12px 10px;font-size:11.5px;color:var(--ink3);line-height:1.45}
+@media (max-width:560px){.cb-fab .t{display:none}.cb-panel{right:16px;bottom:80px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hbar">
+    <button class="logo" id="logoBtn" aria-label="첫 화면으로">
+      <span class="mk">미</span><b>미리노후</b>
+      <span class="pill warn hide-sm">MVP 개발 중</span>
+    </button>
+    <button class="btn ghost sm" id="themeBtn" aria-label="화면 테마 바꾸기">테마</button>
+  </div>
+</header>
+
+<main>
+<!-- ============ 1. 랜딩 ============ -->
+<div id="landing">
+  <div class="wrap hero">
+    <div>
+      <span class="pill">6개 국가 패널 · 머신러닝 · 2년 조기경보</span>
+      <h1>지금은 괜찮은 노후,<br><span class="grad">2년 뒤에도 괜찮을까요?</span></h1>
+      <p class="lead">노후 계산기는 "지금 기준으로 괜찮다"고 말합니다. 미리노후는 그중에서도 <b>2년 뒤부터 소득이 반복해서 빈곤선 아래로 내려갈 신호</b>를, 국가 패널 데이터로 학습한 머신러닝으로 먼저 찾습니다.</p>
+      <div class="cta">
+        <button class="btn primary" data-start="me">내 노후 진단하기</button>
+        <button class="btn ghost" data-start="parent">부모님 대신 진단하기</button>
+      </div>
+      <p class="muted" style="margin-top:12px">입력한 정보는 저장하지 않습니다. 결과는 참고용이며 금융·법률 상담을 대신하지 않습니다.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <b style="font-size:14px">데이터로 본 50~69세</b><span class="muted">봉인 시험 기준</span>
+      </div>
+      <ul class="list">
+        <li><span>지금은 빈곤선 위인 50~69세 중, 2년 뒤부터 반복해서 아래로 내려간 사람</span><b style="color:var(--bad)">100명 중 6~10명</b></li>
+        <li><span>그렇게 내려간 사람 중 4년간 기초생활보장을 받지 못한 비율</span><b style="color:var(--warn)">약 95%</b></li>
+        <li><span>같은 상담 인원으로 찾아낸 하락자 (지금 소득만 볼 때 대비)</span><b style="color:var(--ok)">18~32% 더</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="wrap">
+    <div class="sec-head"><h2>어떤 데이터로, 얼마나 검증했나</h2><p class="muted">모든 수치는 미리노후 분석 보고서(2026.11)의 집계 결과입니다. 원자료는 포함하지 않습니다.</p></div>
+    <div class="stats">
+      <div class="card stat"><div class="l">학습 자료</div><div class="v">6개 패널</div><div class="s">복지·노동·재정·의료·고령화·국민노후보장 패널, 학습 103,864행(사람×조사 차수)</div></div>
+      <div class="card stat"><div class="l">모델 성능 (AUC)</div><div class="v">0.75~0.87</div><div class="s">처음 보는 최근 조사 연도로 채점. AUC는 하락자 1명과 아닌 사람 1명 중 하락자를 더 위험하게 볼 확률</div></div>
+      <div class="card stat"><div class="l">지금 소득만 볼 때보다</div><div class="v">+0.064</div><div class="s">가처분소득 3개 패널 결합 AUC 향상 (95% 신뢰구간 +0.053~+0.075)</div></div>
+      <div class="card stat"><div class="l">하락 위험이 가장 큰 신호</div><div class="v">과거 4년</div><div class="s">지금 월급보다 최근 4년 중 가장 적었던 해, 소득 변동, 최근 실직이 더 중요</div></div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="sec-head"><h2>이렇게 진단합니다</h2></div>
+    <div class="steps">
+      <div class="card step"><div class="n">1</div><h3>질문 13개에 답하기</h3><p class="muted" style="font-size:14px">나이·가구·소득·최근 일 변화·자산. 액수는 대략이어도 괜찮습니다.</p></div>
+      <div class="card step"><div class="n">2</div><h3>계산 + ML 2차 검진</h3><p class="muted" style="font-size:14px">생활비 계산(참고)과 별도로, 머신러닝이 2년 뒤 소득절벽 위험 구간과 이유 3가지를 알려 줍니다.</p></div>
+      <div class="card step"><div class="n">3</div><h3>챙겨볼 제도</h3><p class="muted" style="font-size:14px">기초연금, 재취업 지원, 주택연금처럼 지금 확인해 볼 수 있는 제도로 이어 줍니다.</p></div>
+    </div>
+  </section>
+
+  <section class="wrap" id="status">
+    <div class="sec-head"><h2>개발 현황</h2><p class="muted" id="launchText">정식 출시 일정은 확정 중입니다.</p></div>
+    <div class="road">
+      <div class="card"><div class="tag done">● 완료</div><ul><li>6개 국가 패널 전처리·정답 설계</li><li>모델 비교·사전 등록 검증(봉인 시험, 메타분석)</li><li>개인별 이유·판단 보류·공정성 점검</li></ul></div>
+      <div class="card"><div class="tag doing">● 진행 중 (MVP)</div><ul><li>사람이 직접 답할 수 있는 질문만 쓰는 서비스 모델</li><li>진단 API 서버 (입력값 비저장)</li><li>이 진단 화면과 API 연결</li></ul></div>
+      <div class="card"><div class="tag next">● 예정</div><ul><li>기관용 명단 일괄 진단(지자체·금융기관)</li><li>노후 신탁 상품 연계</li><li>파일럿으로 실제 효과 검증</li></ul></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 2. 입력 ============ -->
+<div id="inputView" class="hidden wrap" style="padding-top:24px">
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px">
+    <button class="btn ghost sm" data-go="landing">← 처음으로</button>
+    <div class="who" role="group" aria-label="누구를 진단하나요">
+      <button class="seg" id="whoMe" aria-pressed="true">나</button>
+      <button class="seg" id="whoParent" aria-pressed="false">부모님</button>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:26px 0 16px">
+    <h2 id="formTitle">본인의 상황을 알려 주세요</h2>
+    <p class="muted">비슷한 예시를 고르거나 직접 입력하세요. 액수는 만원 단위, 대략이어도 됩니다.</p>
+  </div>
+
+  <div class="presets" id="presets"></div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="quick" style="margin-bottom:6px">
+      <input id="quickText" placeholder="말로 적어도 채워져요. 예) 58세 2인 가구, 월 300만원, 작년에 퇴직, 집 4억">
+      <button class="btn ghost sm" id="quickBtn" style="white-space:nowrap">자동 채우기</button>
+    </div>
+    <p class="muted" id="quickMsg" style="margin:0 0 6px">문장에서 숫자만 읽어 칸을 채웁니다. 채워진 값은 꼭 확인해 주세요.</p>
+
+    <form class="form" id="form" onsubmit="return false">
+      <div class="group-t">기본 정보</div>
+      <div class="fld"><label for="age">나이</label><div class="inp"><input id="age" inputmode="numeric" value="58"><span>세</span></div><div class="hint">모델은 50~69세에서 검증됐어요</div></div>
+      <div class="fld"><label>성별</label><div class="yn" data-k="female"><button type="button" data-v="0" aria-pressed="true">남성</button><button type="button" data-v="1" aria-pressed="false">여성</button></div></div>
+      <div class="fld"><label for="hh">함께 사는 가구원 수 (본인 포함)</label><div class="inp"><input id="hh" inputmode="numeric" value="2"><span>명</span></div></div>
+
+      <div class="group-t">소득 (가구 합산, 세금·보험료 뗀 실수령)</div>
+      <div class="fld"><label for="inc">지금 한 달 실수령 소득</label><div class="inp"><input id="inc" class="num" inputmode="numeric" value="300"><span>만원/월</span></div><div class="hint">근로·사업·연금·임대 등 모두 합산</div></div>
+      <div class="fld"><label for="incMin">최근 4년 중 가장 적었던 해의 한 달 소득</label><div class="inp"><input id="incMin" class="num" inputmode="numeric" value="250"><span>만원/월</span></div><div class="hint">대략이면 충분해요</div></div>
+      <div class="fld"><label for="living">은퇴 후 필요한 한 달 생활비</label><div class="inp"><input id="living" class="num" inputmode="numeric" value="250"><span>만원/월</span></div><div class="hint">생활비 계산(참고)에만 쓰여요</div></div>
+
+      <div class="group-t">최근 2년의 변화</div>
+      <div class="fld"><label>지금 일하고 계신가요?</label><div class="yn" data-k="employed"><button type="button" data-v="1" aria-pressed="true">예</button><button type="button" data-v="0" aria-pressed="false">아니오</button></div></div>
+      <div class="fld"><label>최근 2년 사이 일을 그만두신 적이 있나요?</label><div class="yn" data-k="lostJob"><button type="button" data-v="1" aria-pressed="false">예</button><button type="button" data-v="0" aria-pressed="true">아니오</button></div></div>
+      <div class="fld"><label>최근 2년 사이 가구원 수가 바뀌었나요?</label><div class="yn" data-k="hhChange"><button type="button" data-v="1" aria-pressed="false">예</button><button type="button" data-v="0" aria-pressed="true">아니오</button></div><div class="hint">자녀 독립, 배우자 사별 등</div></div>
+
+      <div class="group-t">자산과 연금</div>
+      <div class="fld"><label>국민·공무원·사학연금 가입(또는 수령)</label><div class="yn" data-k="pension"><button type="button" data-v="1" aria-pressed="true">예</button><button type="button" data-v="0" aria-pressed="false">아니오</button></div></div>
+      <div class="fld"><label for="fin">금융자산 (예금·주식·보험 등)</label><div class="inp"><input id="fin" class="num" inputmode="numeric" value="8,000"><span>만원</span></div></div>
+      <div class="fld"><label for="real">부동산 (자가 시세·보증금)</label><div class="inp"><input id="real" class="num" inputmode="numeric" value="40,000"><span>만원</span></div></div>
+      <div class="fld"><label for="debt">갚아야 할 부채</label><div class="inp"><input id="debt" class="num" inputmode="numeric" value="5,000"><span>만원</span></div></div>
+    </form>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px">
+      <p class="muted" style="margin:0">입력값은 저장하지 않습니다.</p>
+      <button class="btn primary" id="submitBtn">진단 결과 보기 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3. 결과 ============ -->
+<div id="resultView" class="hidden wrap" style="padding-top:24px">
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px">
+    <button class="btn ghost sm" data-go="inputView">← 조건 바꿔서 다시</button>
+    <span class="muted" id="profileText"></span>
+  </div>
+
+  <div class="rgrid" style="margin-top:18px">
+    <!-- ML 검진 -->
+    <div class="card" id="mlCard">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <h3>ML 2차 검진 · 2년 뒤 소득절벽 신호</h3><span class="pill">머신러닝</span>
+      </div>
+      <p class="muted" style="margin:2px 0 14px">지금은 빈곤선 위에 있는 50~69세가 2년 뒤부터 반복해서 빈곤선 아래로 내려갈 위험을 봅니다.</p>
+      <div id="mlBody"></div>
+    </div>
+
+    <div style="display:grid;gap:18px">
+      <!-- 빈곤선 비교 -->
+      <div class="card">
+        <h3>지금 소득은 빈곤선의 몇 배인가</h3>
+        <p class="muted" style="margin:2px 0 4px">가구 소득 ÷ √가구원 수(1인 기준 환산)를 가처분 빈곤선과 비교합니다.</p>
+        <div class="ratio-track" id="ratioTrack"><div class="ratio-line" id="ratioLine"></div><div class="ratio-mark" id="ratioMark"></div></div>
+        <div class="kv" style="margin-top:14px">
+          <span class="k">1인 기준 환산 소득</span><span class="v" id="eqInc"></span>
+          <span class="k">빈곤선 (1인, 월)</span><span class="v" id="lineM"></span>
+          <span class="k">빈곤선 대비</span><span class="v" id="ratioV"></span>
+        </div>
+        <p class="muted" style="margin:10px 0 0">빈곤선: 복지패널 가중 중위 가처분소득의 50%(2023년), 2025년 물가로 환산한 연 약 1,859만원. 이 값만 보는 게 '지금 소득' 기준이고, 위 ML 검진은 이것만으로는 안 보이는 사람을 찾습니다.</p>
+      </div>
+
+      <!-- 생활비 계산 -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3>은퇴 후 생활비 계산</h3><span class="pill warn">참고 · 단순 계산</span></div>
+        <p class="muted" style="margin:2px 0 12px">머신러닝이 아닌 단순 가정에 따른 계산입니다.</p>
+        <div class="kv">
+          <span class="k">예상 연금성 수입 (가정)</span><span class="v" id="postInc"></span>
+          <span class="k">필요 생활비</span><span class="v" id="needV"></span>
+          <span class="k">매달 모자란 금액</span><span class="v" id="shortV"></span>
+        </div>
+        <div style="display:grid;gap:8px;margin:14px 0 10px">
+          <label class="tog"><span><b>주택연금</b> (집에 살면서 매달 받기, 만 55세 이상)</span><input type="checkbox" id="solHouse" checked></label>
+          <label class="tog"><span><b>금융자산 나눠 받기</b> (10년에 걸쳐 나눠 쓰기)</span><input type="checkbox" id="solFin" checked></label>
+        </div>
+        <div class="kv">
+          <span class="k">보완 가능 금액</span><span class="v" id="addV" style="color:var(--ok)"></span>
+          <span class="k">보완 후</span><span class="v" id="afterV"></span>
+        </div>
+        <p class="muted" style="margin:10px 0 0">가정: 연금성 수입 = 지금 소득 × 42%(연금 가입) 또는 22%(미가입). 주택연금은 1억원당 월 약 27만원으로 단순 추정했고, 실제 금액은 나이·주택 가격에 따라 다르니 한국주택금융공사에서 확인하세요.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>지금 확인해 볼 제도</h3>
+    <ul class="prog" id="progList"></ul>
+    <p class="muted" style="margin:10px 0 0">자격 여부는 각 기관에서 확인해야 합니다. 이 결과는 참고용이며 금융·법률 상담을 대신하지 않습니다.</p>
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <b style="color:var(--ink2)">미리노후</b> · 노후 신탁 프로젝트 (iM Digital Banker Academy 6조)<br>
+    데이터: 한국복지패널, 한국노동패널, 재정패널, 한국의료패널, 고령화연구패널, 국민노후보장패널. 각 패널 이용약관에 따라 원자료는 포함·재배포하지 않으며, 화면의 수치는 모두 집계 결과입니다.<br>
+    문의: <span id="contact">준비 중</span>
+  </div>
+</footer>
+
+<!-- ===== 상담 챗봇 (CONFIG.CHAT_BASE가 있을 때만 보임) ===== -->
+<button class="cb-fab" id="cbFab" type="button" aria-controls="cbPanel" aria-expanded="false" hidden><span class="dot"></span><span class="t">노후 상담 챗봇</span><span aria-hidden="true">💬</span></button>
+<div class="cb-panel" id="cbPanel" role="dialog" aria-label="미리노후 상담 챗봇" hidden>
+  <div class="cb-head">
+    <div><b>미리노후 상담 챗봇</b><div class="muted">노후 소득·제도에 대해 편하게 물어보세요</div></div>
+    <button class="cb-x" id="cbClose" type="button" aria-label="챗봇 닫기">×</button>
+  </div>
+  <div class="cb-log" id="cbLog" aria-live="polite"></div>
+  <form class="cb-form" id="cbForm" autocomplete="off">
+    <input id="cbInput" maxlength="1000" placeholder="예: 퇴직 후 소득이 줄면 뭘 먼저 알아봐야 하나요?" aria-label="질문 입력">
+    <button type="submit" id="cbSend">보내기</button>
+  </form>
+  <p class="cb-note">답변은 Claude(Anthropic)가 만들며, 입력한 내용은 답변 생성을 위해 전송되고 미리노후 서버에는 저장되지 않습니다. 주민등록번호·계좌번호는 적지 마세요. 금융·법률 상담을 대신하지 않습니다.</p>
+</div>
+
+<script>
+/* ===== 설정: 배포 후 여기만 바꾸면 됩니다 ===== */
+const CONFIG = {
+  API_BASE: '',              // 예: 'https://api.mirinohu.com'  (비어 있으면 ML 검진은 '연결 준비 중'으로 표시)
+  CONTACT_EMAIL: '',         // 예: 'founder@mirinohu.com'
+  LAUNCH_TEXT: '',           // 예: 'MVP 공개 예정: 2027년 상반기'
+  CHAT_BASE: 'https://back-e-w53j.onrender.com',   // 상담 챗봇 서버 (비우면 챗봇 버튼이 숨겨짐)
+  POVERTY_LINE_YEAR: 1859,   // 1인 기준 연 가처분 빈곤선(만원, 2025년 물가)
+};
+const qs = new URLSearchParams(location.search);
+if (qs.get('api')) CONFIG.API_BASE = qs.get('api');
+
+/* ===== 테마 ===== */
+const root = document.documentElement;
+const themeBtn = document.getElementById('themeBtn');
+function curTheme(){ return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+function paintThemeBtn(){ themeBtn.textContent = curTheme() === 'dark' ? '라이트 모드' : '다크 모드'; }
+try { const t = localStorage.getItem('mirinohu-theme'); if (t) root.dataset.theme = t; } catch(e){}
+paintThemeBtn();
+themeBtn.onclick = () => { root.dataset.theme = curTheme() === 'dark' ? 'light' : 'dark'; try{ localStorage.setItem('mirinohu-theme', root.dataset.theme); }catch(e){} paintThemeBtn(); };
+
+if (CONFIG.CONTACT_EMAIL) { const c = document.getElementById('contact'); c.innerHTML = ''; const a = document.createElement('a'); a.href = 'mailto:' + CONFIG.CONTACT_EMAIL; a.textContent = CONFIG.CONTACT_EMAIL; c.appendChild(a); }
+if (CONFIG.LAUNCH_TEXT) document.getElementById('launchText').textContent = CONFIG.LAUNCH_TEXT;
+
+/* ===== 화면 전환 ===== */
+const views = ['landing', 'inputView', 'resultView'];
+function show(id){ views.forEach(v => document.getElementById(v).classList.toggle('hidden', v !== id)); window.scrollTo({top:0, behavior:'smooth'}); }
+document.getElementById('logoBtn').onclick = () => show('landing');
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
+document.querySelectorAll('[data-start]').forEach(b => b.onclick = () => { setWho(b.dataset.start); show('inputView'); });
+
+/* ===== 나 / 부모님 ===== */
+let who = 'me';
+function setWho(w){
+  who = w;
+  document.getElementById('whoMe').setAttribute('aria-pressed', w === 'me');
+  document.getElementById('whoParent').setAttribute('aria-pressed', w === 'parent');
+  document.getElementById('formTitle').textContent = w === 'me' ? '본인의 상황을 알려 주세요' : '부모님의 상황을 알려 주세요';
+}
+document.getElementById('whoMe').onclick = () => setWho('me');
+document.getElementById('whoParent').onclick = () => setWho('parent');
+
+/* ===== 숫자 입력 ===== */
+const raw = s => parseInt(String(s).replace(/[^0-9]/g, ''), 10) || 0;
+const fmt = n => Number(n).toLocaleString('ko-KR');
+document.querySelectorAll('input.num').forEach(i => i.addEventListener('input', () => { const p = i.selectionStart, L = i.value.length; i.value = i.value.replace(/[^0-9]/g,'') ? fmt(raw(i.value)) : ''; const d = i.value.length - L; try{ i.setSelectionRange(p + d, p + d); }catch(e){} }));
+
+/* 예/아니오 버튼 */
+const yn = {};
+document.querySelectorAll('.yn').forEach(g => {
+  const k = g.dataset.k;
+  const set = v => { yn[k] = +v; g.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === String(v))); };
+  g.querySelectorAll('button').forEach(b => b.onclick = () => set(b.dataset.v));
+  set(g.querySelector('[aria-pressed="true"]').dataset.v);
+  g._set = set;
+});
+const setYN = (k, v) => document.querySelector(`.yn[data-k="${k}"]`)._set(v);
+const val = id => document.getElementById(id);
+function setVal(id, n){ const el = val(id); el.value = el.classList.contains('num') ? fmt(n) : n; }
+
+/* ===== 예시 프로필 ===== */
+const PRESETS = [
+  { t:'유형 1 · 부동산 중심', h:'50대 후반 외벌이 직장인', d:['58세 · 2인 가구 · 월 실수령 380만원','4년 중 최저 월 330만원 · 계속 근무','집 4.5억 · 금융 6천 · 부채 6천'],
+    v:{age:58,female:0,hh:2,inc:380,incMin:330,living:280,employed:1,lostJob:0,hhChange:0,pension:1,fin:6000,real:45000,debt:6000} },
+  { t:'유형 2 · 최근 퇴직', h:'60대 초반 · 2년 안에 일을 그만둠', d:['62세 · 2인 가구 · 월 실수령 260만원','4년 중 최저 월 190만원 · 지금 미취업','집 3억 · 금융 4천 · 부채 없음'],
+    v:{age:62,female:0,hh:2,inc:260,incMin:190,living:230,employed:0,lostJob:1,hhChange:0,pension:1,fin:4000,real:30000,debt:0} },
+  { t:'유형 3 · 소득 변동형', h:'50대 중반 자영업 · 1인 가구', d:['55세 · 1인 가구 · 월 실수령 220만원','4년 중 최저 월 120만원 · 수입 들쭉날쭉','전세 1.5억 · 금융 2천 · 연금 미가입'],
+    v:{age:55,female:1,hh:1,inc:220,incMin:120,living:180,employed:1,lostJob:0,hhChange:1,pension:0,fin:2000,real:15000,debt:2000} },
+];
+const pz = document.getElementById('presets');
+PRESETS.forEach(p => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'preset';
+  b.innerHTML = `<div class="t"></div><b></b><ul></ul>`;
+  b.querySelector('.t').textContent = p.t; b.querySelector('b').textContent = p.h;
+  p.d.forEach(x => { const li = document.createElement('li'); li.textContent = x; b.querySelector('ul').appendChild(li); });
+  b.onclick = () => { applyValues(p.v); document.getElementById('form').scrollIntoView({behavior:'smooth', block:'start'}); };
+  pz.appendChild(b);
+});
+function applyValues(v){
+  ['age','hh','inc','incMin','living','fin','real','debt'].forEach(k => { if (v[k] !== undefined) setVal(k, v[k]); });
+  ['female','employed','lostJob','hhChange','pension'].forEach(k => { if (v[k] !== undefined) setYN(k, v[k]); });
+}
+
+/* ===== 말로 입력 → 자동 채우기 (규칙 기반, AI 아님) ===== */
+function parseQuick(t){
+  const v = {}, num = s => parseFloat(s.replace(/,/g,''));
+  let m;
+  if ((m = t.match(/(\d{2})\s*(세|살)/))) v.age = +m[1];
+  if ((m = t.match(/(\d+)\s*인\s*가구/))) v.hh = +m[1]; else if (/혼자|1인/.test(t)) v.hh = 1;
+  if ((m = t.match(/월\s*([\d,]+)\s*만/))) v.inc = num(m[1]);
+  if ((m = t.match(/(집|주택|아파트|부동산|전세)[^\d]{0,6}([\d.]+)\s*억/))) v.real = Math.round(num(m[2]) * 10000);
+  if ((m = t.match(/(예금|적금|금융|저축)[^\d]{0,6}([\d.]+)\s*(억|천)/))) v.fin = Math.round(num(m[2]) * (m[3] === '억' ? 10000 : 1000));
+  if ((m = t.match(/(빚|부채|대출)[^\d]{0,6}([\d.]+)\s*(억|천)/))) v.debt = Math.round(num(m[2]) * (m[3] === '억' ? 10000 : 1000));
+  if (/퇴직|은퇴|그만두|실직|퇴사/.test(t)) { v.lostJob = 1; v.employed = 0; }
+  if (/(지금|현재)?\s*(일하|근무|재직|직장 다니)/.test(t) && !/퇴직|그만두|실직|퇴사/.test(t)) v.employed = 1;
+  if (/여성|여자|엄마|어머니/.test(t)) v.female = 1; else if (/남성|남자|아빠|아버지/.test(t)) v.female = 0;
+  return v;
+}
+document.getElementById('quickBtn').onclick = () => {
+  const v = parseQuick(val('quickText').value), n = Object.keys(v).length;
+  applyValues(v);
+  document.getElementById('quickMsg').textContent = n ? `${n}개 항목을 채웠어요. 아래 값을 확인해 주세요.` : '읽을 수 있는 숫자를 찾지 못했어요. 칸에 직접 입력해 주세요.';
+};
+
+/* ===== 결과 ===== */
+function collect(){
+  return {
+    age: raw(val('age').value), female: yn.female, hh_size: Math.max(1, raw(val('hh').value)),
+    income_month: raw(val('inc').value), income_min4y_month: raw(val('incMin').value),
+    employed: yn.employed, lost_job_2y: yn.lostJob, hh_change_2y: yn.hhChange, pension: yn.pension,
+    fin_asset: raw(val('fin').value), real_asset: raw(val('real').value), debt: raw(val('debt').value),
+    living_cost: raw(val('living').value),
+  };
+}
+let P = null;
+document.getElementById('submitBtn').onclick = () => { P = collect(); show('resultView'); renderAll(); };
+['solHouse','solFin'].forEach(id => val(id).onchange = () => P && renderCalc());
+
+function renderAll(){
+  const who_ = who === 'me' ? '본인' : '부모님';
+  document.getElementById('profileText').textContent = `${who_} · 만 ${P.age}세 · ${P.hh_size}인 가구 · 월 실수령 ${fmt(P.income_month)}만원`;
+  renderRatio(); renderCalc(); renderPrograms(); renderML();
+}
+
+function eqMonthly(m, hh){ return m / Math.sqrt(hh); }
+function renderRatio(){
+  const lineM = CONFIG.POVERTY_LINE_YEAR / 12, eq = eqMonthly(P.income_month, P.hh_size), r = eq / lineM;
+  val('eqInc').textContent = `${fmt(Math.round(eq))}만원/월`;
+  val('lineM').textContent = `${fmt(Math.round(lineM))}만원/월`;
+  val('ratioV').textContent = `${r.toFixed(2)}배`;
+  val('ratioV').style.color = r < 1 ? 'var(--bad)' : r < 1.5 ? 'var(--warn)' : 'var(--ok)';
+  const MAX = 4, pos = x => Math.min(100, Math.max(0, x / MAX * 100));
+  val('ratioLine').style.left = pos(1) + '%';
+  const mk = val('ratioMark'); mk.style.left = pos(r) + '%'; mk.textContent = r > MAX ? `${r.toFixed(1)}배 →` : `${r.toFixed(1)}배`;
+}
+
+function renderCalc(){
+  const rate = P.pension ? 0.42 : 0.22;
+  const post = Math.round(P.income_month * rate), need = P.living_cost, short = Math.max(0, need - post);
+  let add = 0;
+  if (val('solHouse').checked && P.real_asset >= 10000 && P.age >= 55) add += Math.round(P.real_asset / 10000 * 27);
+  if (val('solFin').checked && P.fin_asset > 0) add += Math.round(P.fin_asset / 120);
+  const after = Math.max(0, short - add);
+  val('postInc').textContent = `${fmt(post)}만원/월`;
+  val('needV').textContent = `${fmt(need)}만원/월`;
+  val('shortV').textContent = short > 0 ? `−${fmt(short)}만원/월` : '부족 없음';
+  val('shortV').style.color = short > 0 ? 'var(--warn)' : 'var(--ok)';
+  val('addV').textContent = add > 0 ? `+${fmt(add)}만원/월` : '해당 없음';
+  val('afterV').textContent = short === 0 ? '부족 없음' : after === 0 ? '부족 없음 (보완 시)' : `여전히 −${fmt(after)}만원/월`;
+  val('afterV').style.color = after > 0 ? 'var(--bad)' : 'var(--ok)';
+}
+
+function renderPrograms(){
+  const L = [];
+  const r = eqMonthly(P.income_month, P.hh_size) / (CONFIG.POVERTY_LINE_YEAR / 12);
+  if (P.age >= 65) L.push(['기초연금', '만 65세 이상 중 소득·재산 기준을 충족하면 받을 수 있어요. 국민연금공단·주민센터에서 확인.']);
+  else if (P.age >= 60) L.push(['기초연금 (곧 대상 연령)', '만 65세부터 신청할 수 있어요. 미리 소득인정액 기준을 확인해 두면 좋아요.']);
+  if (!P.employed || P.lost_job_2y) L.push(['중장년 재취업 지원', '고용센터·중장년내일센터의 재취업 상담과 국민내일배움카드 훈련을 확인해 보세요.']);
+  if (P.real_asset >= 10000 && P.age >= 55) L.push(['주택연금', '만 55세 이상 주택 보유자는 집에 살면서 매달 연금을 받을 수 있어요. 한국주택금융공사에서 예상액 조회.']);
+  if (r < 1.2) L.push(['기초생활보장·긴급복지 상담', '소득이 빈곤선 가까이 있다면 주민센터에서 받을 수 있는 지원을 상담해 보세요.']);
+  if (!P.pension) L.push(['국민연금 임의(계속)가입', '가입 기간을 늘리면 연금액이 늘어요. 국민연금공단에서 상담 가능.']);
+  if (!L.length) L.push(['정기 점검', '지금은 뚜렷한 신호가 적어요. 일이나 가구에 변화가 생기면 다시 진단해 보세요.']);
+  const ul = val('progList'); ul.innerHTML = '';
+  L.slice(0, 4).forEach(([t, d]) => { const li = document.createElement('li'); const b = document.createElement('b'); b.textContent = t; li.appendChild(b); li.appendChild(document.createTextNode(d)); ul.appendChild(li); });
+}
+
+/* ===== ML 검진 (API) ===== */
+const BAND = { high:['위험 높음','b-high'], mid:['주의','b-mid'], low:['낮음','b-low'] };
+function mlMsg(title, body, cls='b-na'){
+  const box = val('mlBody'); box.innerHTML = '';
+  const s = document.createElement('span'); s.className = 'badge ' + cls; s.textContent = title; box.appendChild(s);
+  const p = document.createElement('p'); p.className = 'note'; p.style.marginTop = '12px'; p.textContent = body; box.appendChild(p);
+}
+async function renderML(){
+  const lineRatio = eqMonthly(P.income_month, P.hh_size) / (CONFIG.POVERTY_LINE_YEAR / 12);
+  if (P.age < 50 || P.age > 69) return mlMsg('검진 대상 아님', '이 모델은 50~69세 자료로 학습·검증해서, 그 밖의 나이에는 근거 있는 결과를 드릴 수 없어요. 부모님 대신 진단해 보세요.');
+  if (lineRatio < 1) return mlMsg('이미 빈곤선 아래', '이 모델은 "지금은 괜찮은 사람"의 2년 뒤를 보는 모델이에요. 지금 소득이 빈곤선 아래라면 아래 제도 상담을 먼저 권해요.', 'b-high');
+  if (!CONFIG.API_BASE) return mlMsg('모델 서버 연결 준비 중', '진단 API를 개발하고 있어요. 연결되면 여기에 2년 뒤 소득절벽 위험 구간, 그렇게 판단한 이유 3가지, 모델이 확신하지 못할 때의 "판단 보류"가 표시됩니다. 지금은 오른쪽의 빈곤선 비교와 생활비 계산을 참고해 주세요.');
+  mlMsg('진단 중…', '모델이 계산하고 있어요.');
+  try {
+    const body = { ...P }; delete body.living_cost;
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 15000);
+    const res = await fetch(CONFIG.API_BASE.replace(/\/$/, '') + '/predict', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body), signal: ctl.signal });
+    clearTimeout(tm);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    drawML(await res.json());
+  } catch (e) {
+    mlMsg('연결 실패', '모델 서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요. (빈곤선 비교와 생활비 계산은 그대로 볼 수 있어요)');
+  }
+}
+function drawML(r){
+  const box = val('mlBody'); box.innerHTML = '';
+  const [lbl, cls] = r.abstain ? ['판단 보류', 'b-na'] : (BAND[r.band] || ['결과', 'b-na']);
+  const top = document.createElement('div'); top.style.cssText = 'display:flex;align-items:baseline;gap:12px;flex-wrap:wrap';
+  const bd = document.createElement('span'); bd.className = 'badge ' + cls; bd.textContent = lbl; top.appendChild(bd);
+  if (!r.abstain && r.top_pct != null) { const big = document.createElement('span'); big.className = 'big'; big.textContent = `상위 ${Math.round(r.top_pct)}%`; top.appendChild(big);
+    const s = document.createElement('span'); s.className = 'muted'; s.textContent = '같은 연령대 100명 중 위험 순위'; top.appendChild(s); }
+  box.appendChild(top);
+  if (r.abstain) { const n = document.createElement('p'); n.className = 'note'; n.style.marginTop = '12px'; n.textContent = '입력하신 조건에서는 모델이 위험·안전 어느 쪽으로도 확신하지 못했어요. 점수 대신 아래 이유와 제도를 참고해 주세요.'; box.appendChild(n); }
+  if (Array.isArray(r.reasons) && r.reasons.length) {
+    const h = document.createElement('p'); h.style.cssText = 'margin:16px 0 6px;font-weight:700;font-size:14px'; h.textContent = '그렇게 판단한 이유'; box.appendChild(h);
+    const bars = document.createElement('div'); bars.className = 'bars';
+    const mx = Math.max(...r.reasons.map(x => Math.abs(x.effect || 0)), 1e-9);
+    r.reasons.slice(0, 3).forEach(x => {
+      const b = document.createElement('div'); b.className = 'bar';
+      b.innerHTML = '<div class="row"><span></span><span></span></div><div class="track"><div class="fill"></div></div>';
+      b.querySelector('.row span').textContent = x.label;
+      b.querySelectorAll('.row span')[1].textContent = (x.effect || 0) >= 0 ? '위험 ↑' : '위험 ↓';
+      const f = b.querySelector('.fill'); f.style.width = Math.round(Math.abs(x.effect || 0) / mx * 100) + '%'; if ((x.effect || 0) < 0) f.classList.add('down');
+      bars.appendChild(b);
+    });
+    box.appendChild(bars);
+  }
+  if (Array.isArray(r.programs) && r.programs.length) {
+    const h = document.createElement('p'); h.style.cssText = 'margin:16px 0 6px;font-weight:700;font-size:14px'; h.textContent = '모델이 먼저 권하는 것'; box.appendChild(h);
+    const ul = document.createElement('ul'); ul.className = 'prog'; r.programs.slice(0, 2).forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); }); box.appendChild(ul);
+  }
+  const ft = document.createElement('p'); ft.className = 'muted'; ft.style.marginTop = '14px';
+  ft.textContent = (r.model && r.model.note) || '관측 자료로 학습한 예측이며 미래를 보장하지 않습니다. 위험 구간에도 실제로는 괜찮은 사람이 섞여 있어요.';
+  box.appendChild(ft);
+}
+
+/* ===== 상담 챗봇: 프론트 → CHAT_BASE/chat → Claude. API 키는 서버에만 있음 ===== */
+(function(){
+  if (!CONFIG.CHAT_BASE) return;
+  const fab = document.getElementById('cbFab'), panel = document.getElementById('cbPanel'), log = document.getElementById('cbLog');
+  const form = document.getElementById('cbForm'), input = document.getElementById('cbInput'), send = document.getElementById('cbSend');
+  const history = []; let busy = false, warmed = false;
+  fab.hidden = false;
+  function add(cls, text){ const d = document.createElement('div'); d.className = 'cb-msg ' + cls; d.textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; }
+  function open(v){ panel.hidden = !v; fab.setAttribute('aria-expanded', String(v)); if (v){ input.focus(); warm(); } }
+  // 무료 서버는 쉬다가 깨어나는 데 1분쯤 걸려서, 창을 열 때 미리 깨운다
+  function warm(){ if (warmed) return; warmed = true; fetch(CONFIG.CHAT_BASE.replace(/\/$/, '') + '/health').catch(()=>{}); }
+  fab.onclick = () => open(panel.hidden);
+  document.getElementById('cbClose').onclick = () => { open(false); fab.focus(); };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !panel.hidden) { open(false); fab.focus(); } });
+
+  add('bot', '안녕하세요! 미리노후 상담 챗봇이에요. 노후 소득 준비, 연금, 복지 제도에 대해 물어보세요.');
+  const sg = document.createElement('div'); sg.className = 'cb-sugg';
+  ['국민연금 더 받으려면 어떻게 해요?', '퇴직하면 어떤 지원을 받을 수 있나요?', '미리노후 진단은 어떻게 쓰나요?'].forEach(t => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.onclick = () => { sg.remove(); ask(t); }; sg.appendChild(b); });
+  log.appendChild(sg);
+
+  async function ask(text){
+    if (busy || !text) return;
+    busy = true; input.disabled = send.disabled = true;
+    add('me', text); history.push({ role: 'user', content: text });
+    const wait = add('sys', '답변을 만드는 중…');
+    const slow = setTimeout(() => { wait.textContent = '서버를 깨우는 중이에요. 처음 한 번은 1분 정도 걸릴 수 있어요…'; }, 6000);
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 90000);
+    try {
+      const res = await fetch(CONFIG.CHAT_BASE.replace(/\/$/, '') + '/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history.slice(-20) }), signal: ctl.signal });
+      if (res.status === 429) throw new Error('질문이 너무 많아요. 1분쯤 뒤에 다시 물어봐 주세요.');
+      if (!res.ok) throw new Error('지금은 답변을 가져오지 못했어요. 잠시 후 다시 시도해 주세요.');
+      const { reply } = await res.json();
+      history.push({ role: 'assistant', content: reply });
+      wait.remove(); add('bot', reply);
+    } catch (e) {
+      history.pop();   // 실패한 질문은 대화 기록에서 뺀다 (서버 규칙: 마지막은 user)
+      wait.className = 'cb-msg sys'; wait.textContent = e.name === 'AbortError' ? '응답이 너무 늦어요. 잠시 후 다시 시도해 주세요.' : (e.message || '연결에 실패했어요.');
+    } finally {
+      clearTimeout(slow); clearTimeout(tm); busy = false; input.disabled = send.disabled = false; input.focus();
+      while (history.length > 20) history.shift();
+      while (history.length && history[0].role !== 'user') history.shift();
+    }
+  }
+  form.onsubmit = e => { e.preventDefault(); const t = input.value.trim(); input.value = ''; ask(t); };
+})();
+</script>
+</body>
+</html>
