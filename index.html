@@ -241,21 +241,6 @@ footer{border-top:1px solid var(--line);padding:24px 0 90px;color:var(--text3);f
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}#embers{display:none}}
 
-/* ===== 인트로 영상 ===== */
-#intro{position:fixed;inset:0;z-index:200;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .7s ease}
-#intro.out{opacity:0;pointer-events:none}
-#intro[hidden]{display:none}
-#intro video{width:100%;height:100%;object-fit:cover;object-position:50% 30%;background:#000}
-#intro .ibar{position:absolute;top:max(14px,env(safe-area-inset-top));right:14px;left:14px;display:flex;justify-content:space-between;gap:10px;pointer-events:none}
-#intro .ibtn{pointer-events:auto;border:1px solid rgba(255,255,255,.35);background:rgba(11,7,8,.55);backdrop-filter:blur(6px);color:#f4eceb;border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer}
-#intro .ibtn:hover{border-color:var(--blood2)}
-#intro .iplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--title);font-size:20px;padding:16px 28px;background:rgba(200,16,46,.85);border-color:transparent}
-#intro .ibar .ibtn:focus-visible,#intro .iplay:focus-visible{outline:2px solid var(--blood2);outline-offset:2px}
-body.intro-on{overflow:hidden}
-.replay{background:none;border:0;color:var(--text3);text-decoration:underline;cursor:pointer;padding:0;font-size:inherit}
-
-/* 모바일 가로 넘침 방지 (안개·마법진이 화면 밖으로 나감) */
-html{overflow-x:hidden}
 /* ===== 배경 음악 버튼 ===== */
 .hright{display:flex;align-items:center;gap:8px}
 .bgm-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:5px 12px;border-radius:999px;border:1px solid var(--line2);background:rgba(23,16,15,.7);color:var(--text2);cursor:pointer}
@@ -269,14 +254,6 @@ html{overflow-x:hidden}
 </style>
 </head>
 <body>
-<div id="intro" role="dialog" aria-modal="true" aria-label="미리사주 인트로 영상" hidden>
-  <video id="introVid" muted playsinline preload="auto" poster="intro_poster.jpg">
-    <source src="intro.mp4" type="video/mp4">
-    <source src="intro.webm" type="video/webm">
-  </video>
-  <div class="ibar"><button class="ibtn" id="introSound" type="button" aria-pressed="false">🔇 소리 켜기</button><button class="ibtn" id="introSkip" type="button">건너뛰기 ✕</button></div>
-  <button class="ibtn iplay" id="introPlay" type="button" hidden>▶ 아기씨 부르기</button>
-</div>
 <canvas id="embers" aria-hidden="true"></canvas><div class="fog" aria-hidden="true"></div>
 <header><div class="wrap hbar">
   <button class="logo" id="logoBtn" type="button" aria-label="처음으로"><span class="seal">巫</span><b>미리사주</b></button>
@@ -471,8 +448,7 @@ html{overflow-x:hidden}
 <footer><div class="wrap">
   <b style="color:var(--text2)">미리사주</b> · 노후 신탁 프로젝트 (iM Digital Banker Academy 6조)<br>
   데이터: 한국복지패널, 한국노동패널, 재정패널, 한국의료패널, 고령화연구패널, 국민노후보장패널. 각 패널 이용약관에 따라 원자료는 포함·재배포하지 않으며, 화면의 수치는 집계 결과 또는 입력값으로 한 단순 계산입니다.<br>
-  사주는 서비스 콘셉트이며 실제 명리 해석이 아닙니다. 결과는 예측일 뿐 미래를 보장하지 않습니다.<br>
-  <button class="replay" id="introReplay" type="button">인트로 다시 보기</button>
+  사주는 서비스 콘셉트이며 실제 명리 해석이 아닙니다. 결과는 예측일 뿐 미래를 보장하지 않습니다.
 </div></footer>
 
 <!-- ===== 상담 챗봇 ===== -->
@@ -924,46 +900,7 @@ go(0);
 if (!CONFIG.CHAT_BASE) document.getElementById('askBtn').hidden = true;
 document.getElementById('askBtn').onclick = () => { const f = document.getElementById('cbFab'); if (f && !f.hidden) f.click(); };
 
-/* ===== 인트로 영상: 세션당 한 번, 소리는 버튼으로, 움직임 줄이기 설정이면 건너뜀 ===== */
-(function(){
-  const box = document.getElementById('intro'), v = document.getElementById('introVid');
-  const skip = document.getElementById('introSkip'), snd = document.getElementById('introSound'), play = document.getElementById('introPlay');
-  if (!box || !v) return;
-  let open = false, guard = null;
-  const seen = () => { try { return sessionStorage.getItem('mirisaju-intro') === '1'; } catch (e) { return false; } };
-  const mark = () => { try { sessionStorage.setItem('mirisaju-intro', '1'); } catch (e) {} };
-  function close(){
-    if (!open) return; open = false; clearTimeout(guard); mark();
-    document.dispatchEvent(new Event('mirisaju:introclose'));
-    box.classList.add('out'); document.body.classList.remove('intro-on');
-    setTimeout(() => { v.pause(); box.hidden = true; box.classList.remove('out'); }, 700);
-    const s = document.getElementById('startBtn'); if (s) s.focus({ preventScroll: true });
-  }
-  function start(){
-    open = true; box.hidden = false; document.body.classList.add('intro-on'); play.hidden = true;
-    document.dispatchEvent(new Event('mirisaju:introopen'));
-    v.muted = false; snd.textContent = '🔊 소리 끄기'; snd.setAttribute('aria-pressed', 'true');
-    try { v.currentTime = 0; } catch (e) {}
-    v.play().catch(() => {   // 소리 있는 자동재생이 막히면 소리 없이 재생
-      v.muted = true; snd.textContent = '🔇 소리 켜기'; snd.setAttribute('aria-pressed', 'false');
-      v.play().catch(() => { play.hidden = false; play.focus(); });
-    });
-    guard = setTimeout(() => { if (open && v.readyState < 2) close(); }, 6000); // 6초 안에 못 불러오면 닫기
-    skip.focus({ preventScroll: true });
-  }
-  v.addEventListener('ended', close);
-  const srcs = v.querySelectorAll('source'); srcs[srcs.length - 1].addEventListener('error', close);   // 마지막 형식까지 실패하면 닫기
-  v.addEventListener('error', close);
-  skip.onclick = close;
-  play.onclick = () => { play.hidden = true; v.play().catch(close); };
-  snd.onclick = () => { v.muted = !v.muted; snd.textContent = v.muted ? '🔇 소리 켜기' : '🔊 소리 끄기'; snd.setAttribute('aria-pressed', String(!v.muted)); if (v.paused) v.play().catch(() => {}); };
-  document.addEventListener('keydown', e => { if (open && e.key === 'Escape') close(); });
-  const rp = document.getElementById('introReplay'); if (rp) rp.onclick = () => { window.scrollTo({ top: 0 }); start(); };
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!reduce && !seen()) start();
-})();
-
-/* ===== 배경 음악: 메인 화면에서 작게(20%) 시작, 인트로 중엔 멈춤, 끄면 기억 ===== */
+/* ===== 배경 음악: 메인 화면에서 작게(20%) 시작, 끄면 기억 ===== */
 (function(){
   const a = document.getElementById('bgm'), btn = document.getElementById('bgmBtn');
   if (!a || !btn) return;
